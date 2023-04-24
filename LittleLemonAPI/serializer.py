@@ -8,11 +8,8 @@ from django.contrib.auth.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['id', 'username', 'email', 'password']
 
-        extra_kwargs = {
-            'password':{'write_only':True}
-        }
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
@@ -20,77 +17,58 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-#class CategorySerializer(serializers.ModelSerializer):
-#    class Meta:
-#        model = Category
-#        fields = ['id', 'slug', 'title']
+
+#CATEGORIES SERIALIZER
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'slug', 'title']
 
 
 #MENU ITEM SERIALIZER
 class MenuItemSerializer(serializers.ModelSerializer):
-    price_after_tax = serializers.SerializerMethodField(method_name='calculate_tax')
-#    category = CategorySerializer()
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all()
+    )
     class Meta:
         model = MenuItem
-        fields = ['id', 'title', 'price', 'feature', 'price_after_tax']
-
-    def calculate_tax(self, product:MenuItem):
-        return product.price * Decimal(1.1)
+        fields = ['id', 'title', 'price', 'category', 'featured']
 
 
 
 #CART SERIALIZER
-class CartRemoveSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cart
-        fields = ['menuitem']
+class CartSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        default=serializers.CurrentUserDefault()
+    )
 
-class CartHelpSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MenuItem
-        fields = ['id', 'title', 'price']
-
-class CartItemSerializer(serializers.ModelSerializer):
-    menuitem = CartHelpSerializer()
+    def validate(self, attrs):
+        attrs['price'] = attrs['quantity'] * attrs['unit_price']
+        return attrs
 
     class Meta:
         model = Cart
-        fields = ['menuitem', 'quantity', 'price']
+        fields = ['user', 'menuitem', 'unit_price', 'quantity', 'price']
+        extra_kwargs = {
+            'price':{'read_only': True}
+        }
 
-class CartAddSerializer(serializers.ModelSerializer):
-    def validate_quantity(self, value):
-        if(value < 2):
-            raise serializers.ValidationError("Pls input your quantity")
+
+
+#ORDERITEM SERIALIZER
+class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Cart
-        fields = ['menuitem', 'quantity']
-
+        model = OrderItem
+        fields = ['order', 'menuitem', 'quantity', 'price']
 
 
 #ORDER SERIALIZER
-class SingleHelperSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MenuItem
-        fields = ['title', 'price']
-
 class OrderSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+
+    orderitem = OrderItemSerializer(many=True, read_only=True, source='order')
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'total', 'status', 'delivery_crew', 'date']
-
-
-class SingleOrderSerializer(serializers.ModelSerializer):
-    menuitem = SingleHelperSerializer()
-
-    class Meta:
-        model = OrderItem
-        fields = ['menuitem', 'quantity']
-
-
-class OrderPutSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = ['delivery_crew']
+        fields = ['id', 'user', 'total', 'status', 'delivery_crew', 'date', 'orderitem']
 
