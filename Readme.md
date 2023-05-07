@@ -3,19 +3,19 @@
 Source code url:
    https://github.com/MegaNAD60/little-lemon-API
 
-This is a fully CRUD functional app built which allows users to register, browse through all menu items
+This is a fully CRUD functional app, which allows users to register, browse through all menu items
 and provide the functionality to add to cart and make orders. It also allows the Admin to create groups
 and assign these groups to staffs.
 
 Building this app included lots of dependencies which were installed using pipenv, a tool that provides
 all necessary means to create a virtual environment for python projects.
 
-## DEPENDENCIES
-Django
+## DEPENDENCIES / INSTALLATIONS
+Django,
 Django rest_framework,
 Djoser.
 
-## USERS, GROUPS AND THEIR PASSWORD
+## USERS, GROUPS AND THEIR PASSWORD ALREADY CREATED
 ### Admin:
     username: Nehemiah
     password: nehe0000
@@ -42,7 +42,7 @@ Djoser.
     password: paul0000
 
 
-## URL PATH TO GO
+## URL PATH TO VISIT
 To create a new users, with a POST request, visit:
     http://127.0.0.1:8000/api/users/
 
@@ -55,16 +55,16 @@ To access current user, with a GET request and accurate token, visit:
 To access all users as a manager only, with a GET request, visit:
    http://127.0.0.1:8000/api/users/
 
-To add users into manager group as a manager, with a POST request, visit:
+To add users into manager group, which can only be done by a manager, with a POST request, visit:
    http://127.0.0.1:8000/api/groups/manager/users/
 
-To access all users with manager status done by a manager only, with  a GET request, visit:
+To access all users with manager status, which can only be access by a manager, with  a GET request, visit:
    http://127.0.0.1:8000/api/groups/manager/users/
 
-To add users into delivery-crew group as a manager, with a POST request, visit:
+To add users into delivery-crew group, which can only be done by a manager, with a POST request, visit:
    http://127.0.0.1:8000/api/groups/manager/users/
 
-To access all users with delivery-crew status done by a manager only, with  a GET request, visit:
+To access all users with delivery-crew status, which can only be access by a manager, with  a GET request, visit:
    http://127.0.0.1:8000/api/groups/manager/users/
 
 
